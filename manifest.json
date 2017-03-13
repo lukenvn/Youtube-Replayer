@@ -1,0 +1,27 @@
+{
+  "manifest_version": 2,
+  "name": "Youtube-Replayer",
+  "version": "0.1",
+  "description": "Born for helping English learner",
+  "background_page": "background.html",
+  "icons": {
+    "128": "images/repeat-icon.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://www.youtube.com/*",
+        "https://www.youtube.com/*"
+      ],
+      "css": [
+        "css/replayer.css",
+        "css/bootstrap.css"
+      ],
+      "js": [
+        "scripts/jquery.js",
+        "scripts/replayer.js"
+      ]
+    }
+  ]
+}
+
