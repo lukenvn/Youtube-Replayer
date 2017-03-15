@@ -10,6 +10,7 @@ Replayer.control = {
         repeatMainControl.append(this.initEndInputContainer());
         repeatMainControl.append(this.initRepeatCheckBox());
         controlElement.append(repeatMainControl);
+        this.listenForMainControl();
     },
     initStartInputContainer: function () {
         var startMainControl = $('<div>').addClass("one-line");
@@ -59,7 +60,7 @@ Replayer.control = {
         repeatCheckbox.attr('checked', value);
     },
     repeatVideo: function () {
-        Replayer.control.repeat();
+        //Replayer.control.repeat();
         timer = setInterval(function () {
             console.log("loop");
             if (Replayer.control.isRepeatEnable()) {
@@ -73,25 +74,31 @@ Replayer.control = {
             }
         }, 500);
 
-    }, repeat: function () {
+    },
+    repeat: function () {
         videoPlayer.currentTime = stringToSeconds(startInput.val());
         videoPlayer.play();
     },
     clearRepeater: function () {
         clearInterval(timer);
+
+    },
+    reInitValue: function () {
         this.setValueForStartInput(0);
         if (isNaN(videoPlayer.duration)) {
+            console.log("isNaN");
             setTimeout(function () {
+                console.log("after 3 seconds");
                 Replayer.control.setValueForEndInput(videoPlayer.duration);
-            }, 500);
+            }, 3000);
         } else {
             this.setValueForEndInput(videoPlayer.duration);
         }
         this.enableRepeatCheckbox(false);
-    },
+    }
+    ,
     initListener: function () {
         this.listenForKey();
-        this.listenForMainControl();
     },
     listenForKey: function () {
         $(window).keypress(function (e) {
@@ -109,6 +116,7 @@ Replayer.control = {
                     break;
                 case 115:
                     Replayer.control.clearRepeater();
+                    Replayer.control.reInitValue();
                     break;
             }
         });
@@ -132,8 +140,6 @@ Replayer.control = {
             }
         });
     }
-
-
 };
 
 function stringToSeconds(time) {
@@ -164,20 +170,22 @@ function secondsToString(time) {
     }
     return string;
 }
-setTimeout(function () {
-    videoPlayer = document.getElementsByClassName("html5-main-video")[0];
+function init() {
     var videoControls = $('#watch-header');
     Replayer.control.initControlBar(videoControls);
-    try {
-        Replayer.control.clearRepeater();
-    } catch (e) {
-        console.log("problem" + e);
-        setTimeout(function () {
-            Replayer.control.clearRepeater();
-        }, 500);
-    }
-    Replayer.control.initListener();
+    Replayer.control.reInitValue();
 
+}
+setTimeout(function () {
+    videoPlayer = document.getElementsByClassName("html5-main-video")[0];
+    videoPlayer.addEventListener('loadedmetadata', function (e) {
+        console.log("load video");
+        if (!$('#repeatMainControl').length) {
+            init();
+        }
+    });
+    init();
+    Replayer.control.initListener();
 
     //var test =$('#test');
     //Replayer.control.initControlBar(test);
