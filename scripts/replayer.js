@@ -1,4 +1,4 @@
-var Replayer = {};
+var Replayer = Replayer || {};
 var videoPlayer;
 
 var startInput, endInput, startBtn, endBtn, repeatCheckbox;
@@ -10,6 +10,7 @@ Replayer.control = {
         repeatMainControl.append(this.initEndInputContainer());
         repeatMainControl.append(this.initRepeatCheckBox());
         controlElement.append(repeatMainControl);
+        this.listenForMainControl();
     },
     initStartInputContainer: function () {
         var startMainControl = $('<div>').addClass("one-line");
@@ -17,12 +18,7 @@ Replayer.control = {
         startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
         startBtn = $("<button>").addClass("btn btn-default").text("From:");
-        startBtn.click(function () {
-            var currentTime = videoPlayer.currentTime;
-            startInput.val(secondsToString(currentTime));
-        });
         spanGroup.append(startBtn);
-
         childMainControl.append(spanGroup);
         childMainControl.append(startInput);
         startMainControl.append(childMainControl);
@@ -34,12 +30,6 @@ Replayer.control = {
         endInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
         endBtn = $("<button>").addClass("btn btn-default").text("To:");
-        endBtn.click(function () {
-            var currentTime = videoPlayer.currentTime;
-            endInput.val(secondsToString(currentTime));
-            repeatCheckbox.attr('checked', true);
-            Replayer.control.repeatVideo();
-        });
         spanGroup.append(endBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(endInput);
@@ -54,25 +44,25 @@ Replayer.control = {
             .addClass('checkbox');
         var txt = $("<div>").addClass('text').text("Auto Replay");
         label.addClass('replay-container').append(repeatCheckbox, txt);
-        repeatCheckbox.change(function () {
-            if (endInput.val()) {
-                if (Replayer.control.isRepeatEnable()) {
-                    Replayer.control.repeatVideo();
-                } else {
-                    clearInterval(timer);
-                }
-            }
-        });
         checkBoxContainer.append(label);
         return checkBoxContainer;
-    }
-    ,
+    },
     isRepeatEnable: function () {
         return repeatCheckbox.is(':checked');
     },
+    setValueForStartInput: function (value) {
+        startInput.val(secondsToString(value));
+    },
+    setValueForEndInput: function (value) {
+        endInput.val(secondsToString(value));
+    },
+    enableRepeatCheckbox: function (value) {
+        repeatCheckbox.attr('checked', value);
+    },
     repeatVideo: function () {
-        Replayer.control.repeat();
+        //Replayer.control.repeat();
         timer = setInterval(function () {
+            console.log("loop");
             if (Replayer.control.isRepeatEnable()) {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = stringToSeconds(endInput.val());
@@ -84,17 +74,33 @@ Replayer.control = {
             }
         }, 500);
 
-    }, repeat: function () {
+    },
+    repeat: function () {
         videoPlayer.currentTime = stringToSeconds(startInput.val());
         videoPlayer.play();
     },
     clearRepeater: function () {
         clearInterval(timer);
-        startInput.val(secondsToString(0));
-        endInput.val(secondsToString(videoPlayer.duration));
-        repeatCheckbox.attr('checked', false);
+
     },
+    reInitValue: function () {
+        this.setValueForStartInput(0);
+        if (isNaN(videoPlayer.duration)) {
+            console.log("isNaN");
+            setTimeout(function () {
+                console.log("after 3 seconds");
+                Replayer.control.setValueForEndInput(videoPlayer.duration);
+            }, 3000);
+        } else {
+            this.setValueForEndInput(videoPlayer.duration);
+        }
+        this.enableRepeatCheckbox(false);
+    }
+    ,
     initListener: function () {
+        this.listenForKey();
+    },
+    listenForKey: function () {
         $(window).keypress(function (e) {
             var key = e.which;
             console.log("press " + key);
@@ -110,14 +116,30 @@ Replayer.control = {
                     break;
                 case 115:
                     Replayer.control.clearRepeater();
+                    Replayer.control.reInitValue();
                     break;
             }
-
         });
-
     },
-
-
+    listenForMainControl: function () {
+        startBtn.click(function () {
+            Replayer.control.setValueForStartInput(videoPlayer.currentTime);
+        });
+        endBtn.click(function () {
+            Replayer.control.setValueForEndInput(videoPlayer.currentTime);
+            Replayer.control.enableRepeatCheckbox(true);
+            Replayer.control.repeatVideo();
+        });
+        repeatCheckbox.change(function () {
+            if (endInput.val()) {
+                if (Replayer.control.isRepeatEnable()) {
+                    Replayer.control.repeatVideo();
+                } else {
+                    clearInterval(timer);
+                }
+            }
+        });
+    }
 };
 
 function stringToSeconds(time) {
@@ -148,13 +170,22 @@ function secondsToString(time) {
     }
     return string;
 }
-setTimeout(function () {
+function init() {
     var videoControls = $('#watch-header');
-    videoPlayer = document.getElementsByClassName("html5-main-video")[0];
     Replayer.control.initControlBar(videoControls);
-    Replayer.control.clearRepeater();
-    Replayer.control.initListener();
+    Replayer.control.reInitValue();
 
+}
+setTimeout(function () {
+    videoPlayer = document.getElementsByClassName("html5-main-video")[0];
+    videoPlayer.addEventListener('loadedmetadata', function (e) {
+        console.log("load video");
+        if (!$('#repeatMainControl').length) {
+            init();
+        }
+    });
+    init();
+    Replayer.control.initListener();
 
     //var test =$('#test');
     //Replayer.control.initControlBar(test);
