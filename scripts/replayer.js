@@ -20,6 +20,7 @@ Replayer.control = {
         startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
         startBtn = $("<button>").attr('id', 'startBtn').addClass("btn btn-default").text("From:");
+        startBtn.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title',  "Press 'Alt' + 'Z' keys instead");
         spanGroup.append(startBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(startInput);
@@ -32,6 +33,7 @@ Replayer.control = {
         endInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
         endBtn = $("<button>").addClass("btn btn-default").text("To:");
+        endBtn.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Alt' + 'X' keys instead");
         spanGroup.append(endBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(endInput);
@@ -44,6 +46,7 @@ Replayer.control = {
         repeatCheckbox = $("<input type='checkbox'>")
             .attr('check', 'false').attr("id", "myCheckBox")
             .addClass('checkbox');
+        checkBoxContainer.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Alt' + 'S' keys instead");
         var txt = $("<div>").addClass('text').text("Auto Replay");
         label.addClass('replay-container').append(repeatCheckbox, txt);
         checkBoxContainer.append(label);
@@ -62,13 +65,12 @@ Replayer.control = {
         repeatCheckbox.attr('checked', value);
     },
     repeatVideo: function () {
-        //Replayer.control.repeat();
         timer = setInterval(function () {
             console.log("loop");
             if (Replayer.control.isRepeatEnable()) {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = stringToSeconds(endInput.val());
-                if (currentTime > endTime) {
+                if (currentTime >= (endTime-1)) {
                     Replayer.control.repeat();
                 }
             } else {
@@ -194,3 +196,7 @@ setTimeout(function () {
     //var test =$('#test');
     //Replayer.control.initControlBar(test);
 }, 1000);
+
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
