@@ -3,6 +3,8 @@ var videoPlayer;
 
 var startInput, endInput, startBtn, endBtn, repeatCheckbox;
 var timer;
+var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, ALT_CODE = 18;
+var down = {};
 Replayer.control = {
     initControlBar: function (controlElement) {
         var repeatMainControl = $("<div>").attr("id", "repeatMainControl").addClass("row");
@@ -17,7 +19,7 @@ Replayer.control = {
         var childMainControl = $('<div>').addClass("input-group");
         startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
-        startBtn = $("<button>").addClass("btn btn-default").text("From:");
+        startBtn = $("<button>").attr('id', 'startBtn').addClass("btn btn-default").text("From:");
         spanGroup.append(startBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(startInput);
@@ -101,24 +103,26 @@ Replayer.control = {
         this.listenForKey();
     },
     listenForKey: function () {
-        $(window).keypress(function (e) {
-            var key = e.which;
-            console.log("press " + key);
-            switch (key) {
-                case 122:
-                    repeatCheckbox.click();
-                    break;
-                case 120:
-                    startBtn.click();
-                    break;
-                case 99:
-                    endBtn.click();
-                    break;
-                case 115:
-                    Replayer.control.clearRepeater();
-                    Replayer.control.reInitValue();
-                    break;
+        $(window).keydown(function (e) {
+            down[e.keyCode] = true;
+        }).keyup(function (e) {
+            var fromPress = down[ALT_CODE] && down[Z_CODE];
+            var toPress = down[ALT_CODE] && down[X_CODE];
+            var repeatPress = down[ALT_CODE] && down[S_CODE];
+            var resetPress = down[ALT_CODE] && down[C_CODE];
+
+            if (fromPress) {
+                startBtn.click();
+                //$("#startBtn").click();
+            } else if (toPress) {
+                endBtn.click();
+            } else if (repeatPress) {
+                repeatCheckbox.click();
+            } else if (resetPress) {
+                Replayer.control.clearRepeater();
+                Replayer.control.reInitValue();
             }
+            down[e.keyCode] = false;
         });
     },
     listenForMainControl: function () {
