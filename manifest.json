@@ -19,6 +19,7 @@
       ],
       "js": [
         "scripts/jquery.js",
+        "scripts/bootstrap-tooltip.js",
         "scripts/replayer.js"
       ]
     }

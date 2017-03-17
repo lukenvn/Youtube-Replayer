@@ -3,7 +3,7 @@ var videoPlayer;
 
 var startInput, endInput, startBtn, endBtn, repeatCheckbox;
 var timer;
-var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, ALT_CODE = 18;
+var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16;
 var down = {};
 Replayer.control = {
     initControlBar: function (controlElement) {
@@ -20,6 +20,7 @@ Replayer.control = {
         startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
         startBtn = $("<button>").attr('id', 'startBtn').addClass("btn btn-default").text("From:");
+        startBtn.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title',  "Press 'Shift' + 'Z' keys instead");
         spanGroup.append(startBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(startInput);
@@ -32,6 +33,7 @@ Replayer.control = {
         endInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
         endBtn = $("<button>").addClass("btn btn-default").text("To:");
+        endBtn.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'X' keys instead");
         spanGroup.append(endBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(endInput);
@@ -44,6 +46,7 @@ Replayer.control = {
         repeatCheckbox = $("<input type='checkbox'>")
             .attr('check', 'false').attr("id", "myCheckBox")
             .addClass('checkbox');
+        checkBoxContainer.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'S' keys instead");
         var txt = $("<div>").addClass('text').text("Auto Replay");
         label.addClass('replay-container').append(repeatCheckbox, txt);
         checkBoxContainer.append(label);
@@ -62,13 +65,12 @@ Replayer.control = {
         repeatCheckbox.attr('checked', value);
     },
     repeatVideo: function () {
-        //Replayer.control.repeat();
         timer = setInterval(function () {
             console.log("loop");
             if (Replayer.control.isRepeatEnable()) {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = stringToSeconds(endInput.val());
-                if (currentTime > endTime) {
+                if (currentTime >= (endTime-1)) {
                     Replayer.control.repeat();
                 }
             } else {
@@ -106,10 +108,10 @@ Replayer.control = {
         $(window).keydown(function (e) {
             down[e.keyCode] = true;
         }).keyup(function (e) {
-            var fromPress = down[ALT_CODE] && down[Z_CODE];
-            var toPress = down[ALT_CODE] && down[X_CODE];
-            var repeatPress = down[ALT_CODE] && down[S_CODE];
-            var resetPress = down[ALT_CODE] && down[C_CODE];
+            var fromPress = down[Shift_CODE] && down[Z_CODE];
+            var toPress = down[Shift_CODE] && down[X_CODE];
+            var repeatPress = down[Shift_CODE] && down[S_CODE];
+            var resetPress = down[Shift_CODE] && down[C_CODE];
 
             if (fromPress) {
                 startBtn.click();
@@ -194,3 +196,7 @@ setTimeout(function () {
     //var test =$('#test');
     //Replayer.control.initControlBar(test);
 }, 1000);
+
+$(function () {
+    $('[data-toggle="tooltip"]').tooltip();
+});
