@@ -9,6 +9,7 @@
     /*width: 80px;*/
     height: 30px;
 }
+
 .input-text {
     width: 80px !important;
     /*margin-left:px;*/
@@ -19,19 +20,21 @@
     width: 140px;
     display: inline-block;
 }
-#checkboxContainer  {
+
+#checkboxContainer {
     margin-left: 5px;
     margin-bottom: 3px;
     width: 100px;
     display: inline-block;
 }
 
-.replay-container{
+.replay-container {
     float: left !important;
     margin-top: 2px;
     display: inline-block;
 }
-.replay-container .checkbox{
+
+.replay-container .checkbox {
     display: inline-block;
     height: 11px;
     width: 11px;
@@ -40,7 +43,8 @@
     background: none;
     margin-top: 2px;
 }
-.replay-container .text{
+
+.replay-container .text {
     float: right;
     font-weight: bold;
     padding-left: 4px;
@@ -48,10 +52,12 @@
     text-shadow: white 0px 1px 8px;
     display: inline-block;
     -webkit-transition-delay: 0ms;
-    -webkit-transition-property: text-shadow,color;
+    -webkit-transition-property: text-shadow, color;
     -webkit-transition-duration: 300ms;
 }
-#messageBox{
 
+#messageBox {
+    padding-left: 13px;
+    padding-top: 10px;
 
 }

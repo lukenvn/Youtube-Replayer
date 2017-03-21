@@ -2,7 +2,7 @@ var Replayer = Replayer || {};
 var videoPlayer;
 
 var startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox;
-var timer;
+var replayTimer;
 var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16;
 var down = {};
 Replayer.control = {
@@ -83,7 +83,7 @@ Replayer.control = {
         repeatCheckbox.attr('checked', value);
     },
     repeatVideo: function () {
-        timer = setInterval(function () {
+        replayTimer = setInterval(function () {
             console.log("loop");
             if (Replayer.control.isRepeatEnable()) {
                 var currentTime = videoPlayer.currentTime;
@@ -101,7 +101,7 @@ Replayer.control = {
         videoPlayer.play();
     },
     clearRepeater: function () {
-        clearInterval(timer);
+        clearInterval(replayTimer);
 
     },
     reInitValue: function () {
@@ -152,13 +152,13 @@ Replayer.control = {
             Replayer.control.enableRepeatCheckbox(true);
             Replayer.control.repeatVideo();
         });
-        repeatCheckbox.change(function () {
+        repeatCheckbox.click(function () {
             $('.collapse').collapse();
             if (endInput.val()) {
                 if (Replayer.control.isRepeatEnable()) {
                     Replayer.control.repeatVideo();
                 } else {
-                    clearInterval(timer);
+                    clearInterval(replayTimer);
                 }
             }
         });
@@ -207,7 +207,7 @@ function checkInit() {
     if (videoPlayer) {
         videoPlayer.addEventListener('loadedmetadata', function (e) {
             console.log("load video");
-            if (!$('#repeatMainControl').length) {
+            if (!mainControlAlreadyExist()) {
                 init();
             }
         });
@@ -216,9 +216,13 @@ function checkInit() {
     }
     else if (!initTimerId) {
         initTimerId = setInterval(checkInit, 1000);
-    } else {
-        console.log("timer check init");
     }
+}
+function mainControlAlreadyExist(){
+    if ($('#repeatMainControl').length) {
+        return true;
+    }
+    return false;
 }
 setTimeout(function () {
     checkInit();
