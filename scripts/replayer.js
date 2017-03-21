@@ -80,7 +80,7 @@ Replayer.control = {
         endInput.val(secondsToString(value));
     },
     enableRepeatCheckbox: function (value) {
-        repeatCheckbox.attr('checked', value);
+        repeatCheckbox.prop('checked', value);
     },
     repeatVideo: function () {
         replayTimer = setInterval(function () {
@@ -152,7 +152,7 @@ Replayer.control = {
             Replayer.control.enableRepeatCheckbox(true);
             Replayer.control.repeatVideo();
         });
-        repeatCheckbox.click(function () {
+        repeatCheckbox.change(function () {
             $('.collapse').collapse();
             if (endInput.val()) {
                 if (Replayer.control.isRepeatEnable()) {
