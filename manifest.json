@@ -19,7 +19,8 @@
       ],
       "js": [
         "scripts/jquery.js",
-        "scripts/bootstrap-tooltip.js",
+        "scripts/tether.js",
+        "scripts/bootstrap.js",
         "scripts/replayer.js"
       ]
     }
