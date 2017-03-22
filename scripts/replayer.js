@@ -21,7 +21,7 @@ Replayer.control = {
         });
     },
     initStartInputContainer: function () {
-        var startMainControl = $('<div>').addClass("one-line");
+        var startMainControl = $('<div>').addClass("one-line").attr('id', 'startContainer');
         var childMainControl = $('<div>').addClass("input-group");
         startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
@@ -34,7 +34,7 @@ Replayer.control = {
         return startMainControl;
     },
     initEndInputContainer: function () {
-        var endMainControl = $('<div>').addClass("one-line");
+        var endMainControl = $('<div>').addClass("one-line").attr('id', 'endContainer');
         var childMainControl = $('<div>').addClass("input-group");
         endInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
@@ -60,16 +60,9 @@ Replayer.control = {
     },
     initMessageBox: function () {
         messageBox = $('<div>').attr("id", "messageBox").addClass("collapse");
-        messageBox.text("Press 'Shift' + 'C' to clear the repeat");
+        messageBox.text("Press 'Shift' + 'C' to clear the replay");
         return messageBox;
     },
-    showMessage: function () {
-        messageBox.removeClass("hide").addClass("show");
-    },
-    hideMessage: function () {
-        messageBox.removeClass("show").addClass("hide");
-    }
-    ,
     isRepeatEnable: function () {
         return repeatCheckbox.is(':checked');
     },
@@ -80,7 +73,7 @@ Replayer.control = {
         endInput.val(secondsToString(value));
     },
     enableRepeatCheckbox: function (value) {
-        repeatCheckbox.attr('checked', value);
+        repeatCheckbox.prop('checked', value);
     },
     repeatVideo: function () {
         replayTimer = setInterval(function () {
@@ -152,7 +145,7 @@ Replayer.control = {
             Replayer.control.enableRepeatCheckbox(true);
             Replayer.control.repeatVideo();
         });
-        repeatCheckbox.click(function () {
+        repeatCheckbox.change(function () {
             $('.collapse').collapse();
             if (endInput.val()) {
                 if (Replayer.control.isRepeatEnable()) {
@@ -218,7 +211,7 @@ function checkInit() {
         initTimerId = setInterval(checkInit, 1000);
     }
 }
-function mainControlAlreadyExist(){
+function mainControlAlreadyExist() {
     if ($('#repeatMainControl').length) {
         return true;
     }
@@ -226,6 +219,4 @@ function mainControlAlreadyExist(){
 }
 setTimeout(function () {
     checkInit();
-//var test =$('#test');
-//Replayer.control.initControlBar(test);
 }, 1000);
