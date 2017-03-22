@@ -59,5 +59,7 @@
 #messageBox {
     padding-left: 13px;
     padding-top: 10px;
-
+}
+#endContainer{
+    margin-left: 5px;
 }
