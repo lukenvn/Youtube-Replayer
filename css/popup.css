@@ -24,3 +24,6 @@ body {
 .item{
     border-top: 1px dashed #a5a4a1;
 }
+#footer{
+    float: right;
+}
