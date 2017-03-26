@@ -7,15 +7,15 @@ var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16;
 var down = {};
 Replayer.control = {
     initControlBar: function (controlElement) {
-        var repeatMainControl = $("<div>").attr("id", "repeatMainControl").addClass("row");
+        var repeatMainControl = $("<div>").attr("id", "repeatMainControl");
         repeatMainControl.append(this.initStartInputContainer());
         repeatMainControl.append(this.initEndInputContainer());
         repeatMainControl.append(this.initRepeatCheckBox());
         repeatMainControl.append(this.initMessageBox());
         controlElement.append(repeatMainControl);
-        this.initTooltip();
+        this.enableTooltip();
         this.listenForMainControl();
-    }, initTooltip: function () {
+    }, enableTooltip: function () {
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
@@ -46,16 +46,30 @@ Replayer.control = {
         endMainControl.append(childMainControl);
         return endMainControl;
     },
+    //initRepeatCheckBox: function () {
+    //    var checkBoxContainer = $('<div>').attr('id', 'checkboxContainer');
+    //    var label = $("<label>");
+    //    repeatCheckbox = $("<input type='checkbox'>")
+    //        .attr('check', 'false').attr("id", "myCheckBox")
+    //        .addClass('checkbox');
+    //    checkBoxContainer.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'S' keys instead");
+    //    var txt = $("<div>").addClass('text').text("Auto Replay");
+    //    label.addClass('replay-container').append(repeatCheckbox, txt);
+    //    checkBoxContainer.append(label);
+    //    return checkBoxContainer;
+    //},
     initRepeatCheckBox: function () {
-        var checkBoxContainer = $('<div>').attr('id', 'checkboxContainer');
-        var label = $("<label>");
-        repeatCheckbox = $("<input type='checkbox'>")
-            .attr('check', 'false').attr("id", "myCheckBox")
-            .addClass('checkbox');
+        var checkBoxContainer = $('<div>').attr('id', 'checkboxContainer').addClass("checkbox-on-off");
+
+        var span = $(' <span id ="checkboxSpan" class=" yt-uix-checkbox-on-off ">');
+        repeatCheckbox = $('<input id="myCheckBox" class="" type="checkbox">');
+        span.append(repeatCheckbox);
+        checkBoxContainer.append(' <label  for="myCheckBox">Replay</label>');
+
+        span.append('<label for="myCheckBox" id="autoplay-checkbox-label" class=""><span class="checked"></span><span class="toggle"></span><span class="unchecked"></span></label>');
+
+        checkBoxContainer.append(span);
         checkBoxContainer.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'S' keys instead");
-        var txt = $("<div>").addClass('text').text("Auto Replay");
-        label.addClass('replay-container').append(repeatCheckbox, txt);
-        checkBoxContainer.append(label);
         return checkBoxContainer;
     },
     initMessageBox: function () {
@@ -81,7 +95,10 @@ Replayer.control = {
             if (Replayer.control.isRepeatEnable()) {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = stringToSeconds(endInput.val());
-                if (currentTime >= (endTime - 1)) {
+
+                if (currentTime >= endTime || currentTime>= videoPlayer.duration ) {
+                    console.log(endTime);
+                    console.log(currentTime);
                     Replayer.control.repeat();
                 }
             } else {
@@ -157,15 +174,13 @@ Replayer.control = {
         });
     }
 };
-
 function stringToSeconds(time) {
-    var smh = time.split(":"), seconds = 0;
+    var smh = time.split(":"), seconds = 1;
     for (var i = 0; i < smh.length; i++) {
         seconds += smh[i] * Math.pow(60, smh.length - 1 - i);
     }
     return seconds;
 }
-
 function secondsToString(time) {
     var string = "";
     if (time >= 60) {
@@ -195,7 +210,7 @@ function init() {
     }
 }
 var initTimerId;
-function checkInit() {
+function addReplayBar() {
     videoPlayer = document.getElementsByClassName("html5-main-video")[0];
     if (videoPlayer) {
         videoPlayer.addEventListener('loadedmetadata', function (e) {
@@ -208,7 +223,7 @@ function checkInit() {
         clearInterval(initTimerId);
     }
     else if (!initTimerId) {
-        initTimerId = setInterval(checkInit, 1000);
+        initTimerId = setInterval(addReplayBar, 1000);
     }
 }
 function mainControlAlreadyExist() {
@@ -218,5 +233,5 @@ function mainControlAlreadyExist() {
     return false;
 }
 setTimeout(function () {
-    checkInit();
+    addReplayBar();
 }, 1000);
