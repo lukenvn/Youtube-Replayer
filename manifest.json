@@ -5,7 +5,12 @@
   "description": "Born for helping English learner",
   "background_page": "background.html",
   "icons": {
-    "128": "images/repeat-icon.png"
+    "128": "images/repeat-icon.png",
+    "64": "images/autoreplay-64.png",
+    "48": "images/autoreplay-48.png",
+    "32": "images/autoreplay-32.png",
+    "24": "images/autoreplay-24.png",
+    "18": "images/autoreplay-18.png"
   },
   "content_scripts": [
     {
@@ -23,6 +28,11 @@
         "scripts/replayer.js"
       ]
     }
-  ]
+  ],
+  "browser_action": {
+    "default_icon":  "images/autoreplay-32.png",
+    "default_popup": "html/popup.html",
+    "default_title": "Click here!"
+  }
 }
 

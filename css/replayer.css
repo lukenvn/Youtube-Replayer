@@ -1,8 +1,11 @@
 #repeatMainControl {
-    /*float:right;*/
-    /*width: 100%;*/
-    padding-left: 5px;
-    padding-top: 10px;
+    display:inline-flex;
+    padding-top: 8px;
+    margin-top: 8px;
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+    border-top: 1px solid #e2e2e2;
 }
 
 .input-container {
@@ -12,20 +15,15 @@
 
 .input-text {
     width: 80px !important;
-    /*margin-left:px;*/
 }
 
 .one-line {
-    padding-left: 10px;
     width: 140px;
     display: inline-block;
 }
 
 #checkboxContainer {
-    margin-left: 5px;
-    margin-bottom: 3px;
-    width: 100px;
-    display: inline-block;
+    padding-top: 10px;
 }
 
 .replay-container {
@@ -60,6 +58,15 @@
     padding-left: 13px;
     padding-top: 10px;
 }
+@media (max-width:658px) {
+    #messageBox{
+        display:none;
+    }
+
+}
 #endContainer{
     margin-left: 5px;
+}
+#checkboxSpan{
+    margin-left: 4px;
 }
