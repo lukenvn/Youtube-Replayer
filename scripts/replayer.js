@@ -3,7 +3,7 @@ var videoPlayer;
 
 var startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox;
 var replayTimer;
-var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16;
+var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, D_CODE = 68;
 var down = {};
 Replayer.control = {
     initControlBar: function (controlElement) {
@@ -46,18 +46,6 @@ Replayer.control = {
         endMainControl.append(childMainControl);
         return endMainControl;
     },
-    //initRepeatCheckBox: function () {
-    //    var checkBoxContainer = $('<div>').attr('id', 'checkboxContainer');
-    //    var label = $("<label>");
-    //    repeatCheckbox = $("<input type='checkbox'>")
-    //        .attr('check', 'false').attr("id", "myCheckBox")
-    //        .addClass('checkbox');
-    //    checkBoxContainer.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'S' keys instead");
-    //    var txt = $("<div>").addClass('text').text("Auto Replay");
-    //    label.addClass('replay-container').append(repeatCheckbox, txt);
-    //    checkBoxContainer.append(label);
-    //    return checkBoxContainer;
-    //},
     initRepeatCheckBox: function () {
         var checkBoxContainer = $('<div>').attr('id', 'checkboxContainer').addClass("checkbox-on-off");
 
@@ -96,7 +84,7 @@ Replayer.control = {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = stringToSeconds(endInput.val());
 
-                if (currentTime >= endTime || currentTime>= videoPlayer.duration ) {
+                if (currentTime >= endTime || currentTime >= videoPlayer.duration) {
                     console.log(endTime);
                     console.log(currentTime);
                     Replayer.control.repeat();
@@ -139,6 +127,7 @@ Replayer.control = {
             var toPress = down[Shift_CODE] && down[X_CODE];
             var repeatPress = down[Shift_CODE] && down[S_CODE];
             var resetPress = down[Shift_CODE] && down[C_CODE];
+            var replayNowPress = down[Shift_CODE] && down[D_CODE];
 
             if (fromPress) {
                 startBtn.click();
@@ -149,6 +138,8 @@ Replayer.control = {
             } else if (resetPress) {
                 Replayer.control.clearRepeater();
                 Replayer.control.reInitValue();
+            } else if (replayNowPress) {
+                Replayer.control.repeat();
             }
             down[e.keyCode] = false;
         });

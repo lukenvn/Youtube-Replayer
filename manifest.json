@@ -5,7 +5,7 @@
   "description": "Born for helping English learner",
   "background_page": "background.html",
   "icons": {
-    "128": "images/repeat-icon.png",
+    "128": "images/autoreplay-128.png",
     "64": "images/autoreplay-64.png",
     "48": "images/autoreplay-48.png",
     "32": "images/autoreplay-32.png",
