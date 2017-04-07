@@ -33,6 +33,9 @@
     "default_icon":  "images/autoreplay-32.png",
     "default_popup": "html/popup.html",
     "default_title": "Click here!"
+  },
+  "background": {
+    "scripts": ["scripts/background.js"]
   }
 }
 

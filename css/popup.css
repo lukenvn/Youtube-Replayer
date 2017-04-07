@@ -1,5 +1,5 @@
 body {
-    min-width: 250px;
+    min-width: 285px;
     margin: 0px;
     font-family: Segoe UI, Arial, sans-serif;
     font-size: 13px;
@@ -17,8 +17,7 @@ body {
     width: 20%;
 }
 .menu{
-    /*padding-left: 20px;*/
-    /*padding-top: 10px;*/
+
     padding: 10px 0px 10px 15px;
 }
 .item{
@@ -26,4 +25,107 @@ body {
 }
 #footer{
     float: right;
+}
+
+.yt-uix-checkbox-on-off {
+    position: relative;
+    display: inline-block;
+    width: 35px;
+    height: 15px;
+    padding-right: 2px;
+    overflow: hidden;
+    vertical-align: middle;
+    cursor: pointer
+}
+
+.yt-uix-checkbox-on-off input[type=checkbox] {
+    position: absolute;
+    margin: 0;
+    width: 37px;
+    height: 15px;
+    opacity: 0
+}
+
+.yt-uix-checkbox-on-off label {
+    display: inline-block;
+    border: 1px solid transparent;
+    height: 13px;
+    width: 100%;
+    background: #b8b8b8;
+    border-radius: 20px
+}
+
+.yt-uix-checkbox-on-off input[type=checkbox]:checked+label {
+    background-color: #167ac6
+}
+
+.yt-uix-checkbox-on-off label>* {
+    display: inline-block;
+    height: 100%;
+    vertical-align: top;
+    -moz-transition: width .1s;
+    -webkit-transition: width .1s;
+    transition: width .1s
+}
+
+.yt-uix-checkbox-on-off .checked {
+    text-align: center;
+    line-height: 13px
+}
+
+.yt-uix-checkbox-on-off .checked:before {
+    content: '';
+    display: inline-block;
+    vertical-align: middle;
+    background: no-repeat url(https://s.ytimg.com/yts/imgbin/www-hitchhiker-vflcg0JDg.webp) -456px -87px;
+    background-size: auto;
+    width: 10px;
+    height: 7px
+}
+
+.yt-uix-checkbox-on-off .toggle {
+    margin-left: -4px;
+    background: #fbfbfb;
+    width: 13px;
+    border-radius: 13px
+}
+.yt-uix-checkbox-on-off .checked,.yt-uix-checkbox-on-off input[type=checkbox]:checked+label .unchecked {
+    width: 0
+}
+
+.yt-uix-checkbox-on-off .unchecked,.yt-uix-checkbox-on-off input[type=checkbox]:checked+label .checked {
+    width: 22px
+}
+
+.yt-uix-checkbox-on-off input[type=checkbox]:disabled+label {
+    opacity: .5
+}
+
+.yt-uix-checkbox-on-off.large {
+    width: 54px;
+    height: 24px
+}
+
+.yt-uix-checkbox-on-off.large input[type=checkbox] {
+    width: 56px;
+    height: 24px
+}
+
+.yt-uix-checkbox-on-off.large label {
+    height: 22px;
+    border-radius: 22px
+}
+
+.yt-uix-checkbox-on-off.large .checked {
+    line-height: 22px
+}
+
+.yt-uix-checkbox-on-off.large label .toggle {
+    width: 22px;
+    height: 22px;
+    border-radius: 22px
+}
+
+.yt-uix-checkbox-on-off.large .unchecked,.yt-uix-checkbox-on-off.large input[type=checkbox]:checked+label .checked {
+    width: 32px
 }

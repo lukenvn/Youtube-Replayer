@@ -5,6 +5,7 @@ var startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox;
 var replayTimer;
 var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, D_CODE = 68;
 var down = {};
+var enableRepeatAtB;
 Replayer.control = {
     initControlBar: function (controlElement) {
         var repeatMainControl = $("<div>").attr("id", "repeatMainControl");
@@ -150,8 +151,7 @@ Replayer.control = {
         });
         endBtn.click(function () {
             Replayer.control.setValueForEndInput(videoPlayer.currentTime);
-            Replayer.control.enableRepeatCheckbox(true);
-            Replayer.control.repeatVideo();
+            Replayer.control.checkAutoRepeatAtB();
         });
         repeatCheckbox.change(function () {
             $('.collapse').collapse();
@@ -161,6 +161,15 @@ Replayer.control = {
                 } else {
                     clearInterval(replayTimer);
                 }
+            }
+        });
+    },
+    checkAutoRepeatAtB: function () {
+        chrome.runtime.sendMessage({message: "check_auto_repeat_at_b"}, function (response) {
+            enableRepeatAtB = response.enableRepeat;
+            if (enableRepeatAtB) {
+                Replayer.control.enableRepeatCheckbox(enableRepeatAtB);
+                Replayer.control.repeatVideo();
             }
         });
     }
@@ -226,3 +235,4 @@ function mainControlAlreadyExist() {
 setTimeout(function () {
     addReplayBar();
 }, 1000);
+
