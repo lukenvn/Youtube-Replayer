@@ -1,19 +1,19 @@
 "use strict";
 var Replayer = Replayer || {};
 var videoPlayer, startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox, checkBoxContainer;
-var replayTimer;
+var replayTimer, initTimerId;
 var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, D_CODE = 68;
-var down = {};
+var downKeysMap = {};
 var enableRepeatAtB;
 var controlObj;
 var REPLAY_LABEL = 'Replay';
 var MESSAGE = {
-        A_TOOLTIP: "Press 'Shift' + 'Z' keys instead",
-        B_TOOLTIP: "Press 'Shift' + 'X' keys instead",
-        CHECKBOX_TOOLTIP: "Press 'Shift' + 'S' keys instead",
-        CLEAR_AB:"Press 'Shift' + 'C' to clear the replay",
-        TIME_RANGE_INVALID: "A and B are invalid!"
-    };
+    A_TOOLTIP: "Press 'Shift' + 'Z' keys instead",
+    B_TOOLTIP: "Press 'Shift' + 'X' keys instead",
+    CHECKBOX_TOOLTIP: "Press 'Shift' + 'S' keys instead",
+    CLEAR_AB: "Press 'Shift' + 'C' to clear the replay",
+    TIME_RANGE_INVALID: "A and B are invalid!"
+};
 Replayer.control = {
     initControlBar: function (controlElement) {
         var repeatMainControl = $("<div>").attr("id", "repeatMainControl");
@@ -59,7 +59,7 @@ Replayer.control = {
     initRepeatCheckBox: function () {
         checkBoxContainer = $('<div id="checkboxContainer" class="checkbox-on-off">');
         var span = $(' <span id ="checkboxSpan" class=" yt-uix-checkbox-on-off ">');
-        repeatCheckbox = $('<input id="myCheckBox" class="" type="checkbox">');
+        repeatCheckbox = $('<input id="myCheckBox" type="checkbox">');
         span.append(repeatCheckbox);
         checkBoxContainer.append($('<label for="myCheckBox" />').text(REPLAY_LABEL));
         span.append('<label for="myCheckBox" id="autoplay-checkbox-label" class=""><span class="checked"></span><span class="toggle"></span><span class="unchecked"></span></label>');
@@ -155,13 +155,13 @@ Replayer.control = {
     ,
     listenForKey: function () {
         $(window).keydown(function (e) {
-            down[e.keyCode] = true;
+            downKeysMap[e.keyCode] = true;
         }).keyup(function (e) {
-            var fromPress = down[Shift_CODE] && down[Z_CODE];
-            var toPress = down[Shift_CODE] && down[X_CODE];
-            var repeatPress = down[Shift_CODE] && down[S_CODE];
-            var resetPress = down[Shift_CODE] && down[C_CODE];
-            var replayNowPress = down[Shift_CODE] && down[D_CODE];
+            var fromPress = downKeysMap[Shift_CODE] && downKeysMap[Z_CODE];
+            var toPress = downKeysMap[Shift_CODE] && downKeysMap[X_CODE];
+            var repeatPress = downKeysMap[Shift_CODE] && downKeysMap[S_CODE];
+            var resetPress = downKeysMap[Shift_CODE] && downKeysMap[C_CODE];
+            var replayNowPress = downKeysMap[Shift_CODE] && downKeysMap[D_CODE];
             if (fromPress) {
                 startBtn.click();
             } else if (toPress) {
@@ -174,7 +174,7 @@ Replayer.control = {
             } else if (replayNowPress) {
                 controlObj.repeat();
             }
-            down[e.keyCode] = false;
+            downKeysMap[e.keyCode] = false;
         });
     },
     listenForMainControl: function () {
@@ -272,8 +272,6 @@ var Utils = {
         });
     }
 };
-
-var initTimerId;
 setTimeout(function () {
     controlObj = Replayer.control;
     Replayer.control.addReplayBar();
