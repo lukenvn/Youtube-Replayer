@@ -1,11 +1,17 @@
+"use strict";
 var Replayer = Replayer || {};
-var videoPlayer;
-
-var startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox;
+var videoPlayer, startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox, checkBoxContainer;
 var replayTimer;
 var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, D_CODE = 68;
 var down = {};
 var enableRepeatAtB;
+var controlObj;
+
+var A_TOOLTIP_MESSAGE =  "Press 'Shift' + 'Z' keys instead";
+var B_TOOLTIP_MESSAGE =  "Press 'Shift' + 'X' keys instead";
+var CHECKBOX_TOOLTIP_MESSAGE =  "Press 'Shift' + 'S' keys instead";
+var MESSAGE_BOX_MESSAGE="Press 'Shift' + 'C' to clear the replay";
+var REPLAY_LABEL ='Replay';
 Replayer.control = {
     initControlBar: function (controlElement) {
         var repeatMainControl = $("<div>").attr("id", "repeatMainControl");
@@ -14,9 +20,12 @@ Replayer.control = {
         repeatMainControl.append(this.initRepeatCheckBox());
         repeatMainControl.append(this.initMessageBox());
         controlElement.append(repeatMainControl);
-        this.enableTooltip();
-        this.listenForMainControl();
+        controlObj.enableTooltip();
+        controlObj.listenForMainControl();
     }, enableTooltip: function () {
+        Utils.addBottomToolTip(startBtn, A_TOOLTIP_MESSAGE);
+        Utils.addBottomToolTip(endBtn, B_TOOLTIP_MESSAGE);
+        Utils.addBottomToolTip(checkBoxContainer, CHECKBOX_TOOLTIP_MESSAGE);
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
@@ -26,8 +35,7 @@ Replayer.control = {
         var childMainControl = $('<div>').addClass("input-group");
         startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
-        startBtn = $("<button>").attr('id', 'startBtn').addClass("btn btn-default").text("From:");
-        startBtn.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'Z' keys instead");
+        startBtn = $("<button>").attr('id', 'startBtn').addClass("btn btn-default").text("A");
         spanGroup.append(startBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(startInput);
@@ -39,8 +47,7 @@ Replayer.control = {
         var childMainControl = $('<div>').addClass("input-group");
         endInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
         var spanGroup = $("<span>").addClass("input-group-btn");
-        endBtn = $("<button>").addClass("btn btn-default").text("To:");
-        endBtn.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'X' keys instead");
+        endBtn = $("<button>").addClass("btn btn-default").text("B");
         spanGroup.append(endBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(endInput);
@@ -48,32 +55,28 @@ Replayer.control = {
         return endMainControl;
     },
     initRepeatCheckBox: function () {
-        var checkBoxContainer = $('<div>').attr('id', 'checkboxContainer').addClass("checkbox-on-off");
-
+        checkBoxContainer = $('<div>').attr('id', 'checkboxContainer').addClass("checkbox-on-off");
         var span = $(' <span id ="checkboxSpan" class=" yt-uix-checkbox-on-off ">');
         repeatCheckbox = $('<input id="myCheckBox" class="" type="checkbox">');
         span.append(repeatCheckbox);
-        checkBoxContainer.append(' <label  for="myCheckBox">Replay</label>');
-
+        checkBoxContainer.append($('<label for="myCheckBox"/>').text(REPLAY_LABEL));
         span.append('<label for="myCheckBox" id="autoplay-checkbox-label" class=""><span class="checked"></span><span class="toggle"></span><span class="unchecked"></span></label>');
-
         checkBoxContainer.append(span);
-        checkBoxContainer.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', "Press 'Shift' + 'S' keys instead");
         return checkBoxContainer;
     },
     initMessageBox: function () {
         messageBox = $('<div>').attr("id", "messageBox").addClass("collapse");
-        messageBox.text("Press 'Shift' + 'C' to clear the replay");
+        messageBox.text(MESSAGE_BOX_MESSAGE);
         return messageBox;
     },
     isRepeatEnable: function () {
         return repeatCheckbox.is(':checked');
     },
     setValueForStartInput: function (value) {
-        startInput.val(secondsToString(value));
+        startInput.val(Utils.secondsToString(value));
     },
     setValueForEndInput: function (value) {
-        endInput.val(secondsToString(value));
+        endInput.val(Utils.secondsToString(value));
     },
     enableRepeatCheckbox: function (value) {
         repeatCheckbox.prop('checked', value);
@@ -81,27 +84,23 @@ Replayer.control = {
     repeatVideo: function () {
         replayTimer = setInterval(function () {
             console.log("loop");
-            if (Replayer.control.isRepeatEnable()) {
+            if (controlObj.isRepeatEnable()) {
                 var currentTime = videoPlayer.currentTime;
-                var endTime = stringToSeconds(endInput.val());
-
+                var endTime = Utils.stringToSeconds(endInput.val());
                 if (currentTime >= endTime || currentTime >= videoPlayer.duration) {
-                    console.log(endTime);
-                    console.log(currentTime);
-                    Replayer.control.repeat();
+                    controlObj.repeat();
                 }
             } else {
-                Replayer.control.clearRepeater();
+                controlObj.clearRepeater();
             }
         }, 500);
     },
     repeat: function () {
-        videoPlayer.currentTime = stringToSeconds(startInput.val());
+        videoPlayer.currentTime = Utils.stringToSeconds(startInput.val());
         videoPlayer.play();
     },
     clearRepeater: function () {
         clearInterval(replayTimer);
-
     },
     reInitValue: function () {
         this.setValueForStartInput(0);
@@ -109,7 +108,7 @@ Replayer.control = {
             console.log("isNaN");
             setTimeout(function () {
                 console.log("after 3 seconds");
-                Replayer.control.setValueForEndInput(videoPlayer.duration);
+                controlObj.setValueForEndInput(videoPlayer.duration);
             }, 3000);
         } else {
             this.setValueForEndInput(videoPlayer.duration);
@@ -117,9 +116,6 @@ Replayer.control = {
         this.enableRepeatCheckbox(false);
     }
     ,
-    initListener: function () {
-        this.listenForKey();
-    },
     listenForKey: function () {
         $(window).keydown(function (e) {
             down[e.keyCode] = true;
@@ -129,7 +125,6 @@ Replayer.control = {
             var repeatPress = down[Shift_CODE] && down[S_CODE];
             var resetPress = down[Shift_CODE] && down[C_CODE];
             var replayNowPress = down[Shift_CODE] && down[D_CODE];
-
             if (fromPress) {
                 startBtn.click();
             } else if (toPress) {
@@ -137,27 +132,27 @@ Replayer.control = {
             } else if (repeatPress) {
                 repeatCheckbox.click();
             } else if (resetPress) {
-                Replayer.control.clearRepeater();
-                Replayer.control.reInitValue();
+                controlObj.clearRepeater();
+                controlObj.reInitValue();
             } else if (replayNowPress) {
-                Replayer.control.repeat();
+                controlObj.repeat();
             }
             down[e.keyCode] = false;
         });
     },
     listenForMainControl: function () {
         startBtn.click(function () {
-            Replayer.control.setValueForStartInput(videoPlayer.currentTime);
+            controlObj.setValueForStartInput(videoPlayer.currentTime);
         });
         endBtn.click(function () {
-            Replayer.control.setValueForEndInput(videoPlayer.currentTime);
-            Replayer.control.checkAutoRepeatAtB();
+            controlObj.setValueForEndInput(videoPlayer.currentTime);
+            controlObj.checkAutoRepeatAtB();
         });
         repeatCheckbox.change(function () {
             $('.collapse').collapse();
             if (endInput.val()) {
-                if (Replayer.control.isRepeatEnable()) {
-                    Replayer.control.repeatVideo();
+                if (controlObj.isRepeatEnable()) {
+                    controlObj.repeatVideo();
                 } else {
                     clearInterval(replayTimer);
                 }
@@ -166,73 +161,80 @@ Replayer.control = {
     },
     checkAutoRepeatAtB: function () {
         chrome.runtime.sendMessage({message: "check_auto_repeat_at_b"}, function (response) {
-            enableRepeatAtB = response.enableRepeat;
+            enableRepeatAtB = response.enableRepeatAtB;
             if (enableRepeatAtB) {
-                Replayer.control.enableRepeatCheckbox(enableRepeatAtB);
-                Replayer.control.repeatVideo();
+                controlObj.enableRepeatCheckbox(enableRepeatAtB);
+                controlObj.repeatVideo();
             }
         });
+    },
+    addReplayBar: function () {
+        videoPlayer = document.getElementsByClassName("html5-main-video")[0];
+        if (videoPlayer) {
+            videoPlayer.addEventListener('loadedmetadata', function (e) {
+                console.log("load video");
+                if (!controlObj.mainControlAlreadyExist()) {
+                    Replayer.control.init();
+                }
+            });
+            Replayer.control.init();
+            clearInterval(initTimerId);
+        }
+        else if (!initTimerId) {
+            initTimerId = setInterval(controlObj.addReplayBar, 1000);
+        }
+    },
+    init: function () {
+        var videoControls = $('#watch-header');
+        if (videoControls.length) {
+            Replayer.control.initControlBar(videoControls);
+            Replayer.control.reInitValue();
+            Replayer.control.listenForKey();
+        }
+    },
+    mainControlAlreadyExist: function () {
+        if($('#repeatMainControl').length){
+            return true;
+        }
+        return false;
     }
 };
-function stringToSeconds(time) {
-    var smh = time.split(":"), seconds = 1;
-    for (var i = 0; i < smh.length; i++) {
-        seconds += smh[i] * Math.pow(60, smh.length - 1 - i);
-    }
-    return seconds;
-}
-function secondsToString(time) {
-    var string = "";
-    if (time >= 60) {
-        var smh = [];
-        while (parseInt(time) > 0) {
-            smh.push(parseInt(time % 60));
-            time /= 60;
+var Utils = {
+    stringToSeconds: function (time) {
+        var smh = time.split(":"), seconds = 1;
+        for (var i = 0; i < smh.length; i++) {
+            seconds += smh[i] * Math.pow(60, smh.length - 1 - i);
         }
-        for (var i = smh.length - 1; i >= 0; i--) {
-            var t = smh[i];
-            string += (i != smh.length - 1 && t < 10) ? "0" + t : t;
-            if (i > 0) {
-                string += ":";
+        return seconds;
+    },
+    secondsToString: function (time) {
+        var string = "";
+        if (time >= 60) {
+            var smh = [];
+            while (parseInt(time) > 0) {
+                smh.push(parseInt(time % 60));
+                time /= 60;
             }
+            for (var i = smh.length - 1; i >= 0; i--) {
+                var t = smh[i];
+                string += (i != smh.length - 1 && t < 10) ? "0" + t : t;
+                if (i > 0) {
+                    string += ":";
+                }
+            }
+        } else {
+            string = "0:" + parseInt(time);
         }
-    } else {
-        string = "0:" + parseInt(time);
+        return string;
+    },
+    addBottomToolTip: function (element, message) {
+        element.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', message);
     }
-    return string;
-}
-function init() {
-    var videoControls = $('#watch-header');
-    if (videoControls.length) {
-        Replayer.control.initControlBar(videoControls);
-        Replayer.control.reInitValue();
-        Replayer.control.initListener();
-    }
-}
+};
+
 var initTimerId;
-function addReplayBar() {
-    videoPlayer = document.getElementsByClassName("html5-main-video")[0];
-    if (videoPlayer) {
-        videoPlayer.addEventListener('loadedmetadata', function (e) {
-            console.log("load video");
-            if (!mainControlAlreadyExist()) {
-                init();
-            }
-        });
-        init();
-        clearInterval(initTimerId);
-    }
-    else if (!initTimerId) {
-        initTimerId = setInterval(addReplayBar, 1000);
-    }
-}
-function mainControlAlreadyExist() {
-    if ($('#repeatMainControl').length) {
-        return true;
-    }
-    return false;
-}
 setTimeout(function () {
-    addReplayBar();
+    controlObj = Replayer.control;
+    Replayer.control.addReplayBar();
 }, 1000);
 

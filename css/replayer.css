@@ -1,5 +1,5 @@
 #repeatMainControl {
-    display:inline-flex;
+    display: inline-flex;
     padding-top: 8px;
     margin-top: 8px;
     margin-left: 0;
@@ -7,66 +7,42 @@
     width: 100%;
     border-top: 1px solid #e2e2e2;
 }
-
-.input-container {
-    /*width: 80px;*/
-    height: 30px;
+#repeatMainControl .input-text {
+    width: 72px !important;
 }
 
-.input-text {
-    width: 80px !important;
-}
-
-.one-line {
-    width: 140px;
+#repeatMainControl .one-line {
+    width: 110px;
     display: inline-block;
 }
 
-#checkboxContainer {
+#repeatMainControl #checkboxContainer {
     padding-top: 10px;
 }
 
-.replay-container {
-    float: left !important;
-    margin-top: 2px;
-    display: inline-block;
-}
-
-.replay-container .checkbox {
-    display: inline-block;
-    height: 11px;
-    width: 11px;
-    margin-left: 3px;
-    color: rgb(17, 51, 204) !important;
-    background: none;
-    margin-top: 2px;
-}
-
-.replay-container .text {
-    float: right;
-    font-weight: bold;
-    padding-left: 4px;
-    padding-top: 3px;
-    text-shadow: white 0px 1px 8px;
-    display: inline-block;
-    -webkit-transition-delay: 0ms;
-    -webkit-transition-property: text-shadow, color;
-    -webkit-transition-duration: 300ms;
-}
-
-#messageBox {
+#repeatMainControl #messageBox {
     padding-left: 13px;
     padding-top: 10px;
 }
-@media (max-width:658px) {
-    #messageBox{
-        display:none;
-    }
 
+@media (max-width: 658px) {
+    #repeatMainControl #messageBox {
+        display: none;
+    }
 }
-#endContainer{
-    margin-left: 5px;
-}
-#checkboxSpan{
+
+#repeatMainControl #endContainer {
     margin-left: 4px;
+}
+
+#repeatMainControl #checkboxContainer {
+    margin-left: 4px;
+}
+
+#repeatMainControl #checkboxSpan {
+    margin-left: 4px;
+}
+
+#repeatMainControl .form-control {
+    height: 33px;
 }
