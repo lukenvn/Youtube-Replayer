@@ -257,7 +257,7 @@ Replayer.control = {
             Replayer.control.listenForKey();
         } else {
             console.log("wait for page load completed");
-            setTimeout(Replayer.control.init(), 1000);
+            setTimeout(Replayer.control.init(), 3000);
         }
 
 
