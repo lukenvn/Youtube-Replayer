@@ -2,7 +2,7 @@
 var Replayer = Replayer || {};
 var videoPlayer, startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox, checkBoxContainer;
 var replayTimer, initTimerId;
-var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, A_CODE = 65,B_CODE=66;
+var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, A_CODE = 65, B_CODE = 66;
 var downKeysMap = {};
 var enableRepeatAtB;
 var controlObj;
@@ -73,6 +73,8 @@ Replayer.control = {
     },
     showErrorMessage: function (message) {
         messageBox.addClass('errorMessageText');
+        endInput.addClass('errorMessageText');
+        startInput.addClass('errorMessageText');
         controlObj.showMessage(message);
     },
     showMessage: function (message) {
@@ -83,6 +85,8 @@ Replayer.control = {
         if (messageBox.attr('class').indexOf('error') >= 0) {
             messageBox.removeClass();
             messageBox.text('');
+            endInput.removeClass('errorMessageText');
+            startInput.removeClass('errorMessageText');
         }
     }
     ,
@@ -98,25 +102,28 @@ Replayer.control = {
     enableRepeatCheckbox: function (value) {
         repeatCheckbox.prop('checked', value);
     },
+    checkTimeRange: function () {
+        if (!Replayer.control.timeRangeIsValid()) {
+            Replayer.control.showGuildMessage(false);
+            return false;
+        }
+        Replayer.control.showGuildMessage(true);
+        return true;
+    },
     timeRangeIsValid: function () {
-        return startInput.val() < endInput.val();
+        return controlObj.AInSeconds() < controlObj.BInSeconds();
     },
     showGuildMessage: function (valid) {
         if (!valid) {
             controlObj.enableRepeatCheckbox(false);
             Replayer.control.showErrorMessage(MESSAGE.TIME_RANGE_INVALID);
-            return;
+        } else {
+            Replayer.control.clearErrorMessage();
+            Replayer.control.showMessage(MESSAGE.CLEAR_AB);
         }
-        Replayer.control.clearErrorMessage();
-        Replayer.control.showMessage(MESSAGE.CLEAR_AB);
     }
     ,
     repeatVideo: function () {
-        if (!Replayer.control.timeRangeIsValid()) {
-            Replayer.control.showGuildMessage(false);
-            return;
-        }
-        Replayer.control.showGuildMessage(true);
         replayTimer = setInterval(function () {
             console.log("loop");
             if (controlObj.isRepeatEnable()) {
@@ -136,7 +143,7 @@ Replayer.control = {
     BInSeconds: function () {
         return Utils.stringToSeconds(endInput.val());
     },
-    goto:function(expectedTime){
+    goto: function (expectedTime) {
         if (expectedTime <= videoPlayer.duration) {
             videoPlayer.currentTime = expectedTime;
             videoPlayer.play();
@@ -182,7 +189,7 @@ Replayer.control = {
                 controlObj.reInitValue();
             } else if (goToAPress) {
                 controlObj.goto(controlObj.AInSeconds());
-            }else if (goToBPress){
+            } else if (goToBPress) {
                 controlObj.goto(controlObj.BInSeconds());
             }
             downKeysMap[e.keyCode] = false;
@@ -191,18 +198,28 @@ Replayer.control = {
     listenForMainControl: function () {
         startBtn.click(function () {
             controlObj.setValueForStartInput(videoPlayer.currentTime);
+            controlObj.checkTimeRange();
         });
         endBtn.click(function () {
             controlObj.setValueForEndInput(videoPlayer.currentTime);
             controlObj.checkAutoRepeatAtB();
+            controlObj.checkTimeRange();
         });
-        repeatCheckbox.change(function () {
-            $('.collapse').collapse();
-            if (endInput.val()) {
-                if (controlObj.isRepeatEnable()) {
-                    controlObj.repeatVideo();
-                } else {
-                    clearInterval(replayTimer);
+        endInput.change(function () {
+            controlObj.checkTimeRange();
+        });
+        startInput.change(function () {
+            controlObj.checkTimeRange();
+        });
+        repeatCheckbox.click(function () {
+            if (controlObj.checkTimeRange()) {
+                $('.collapse').collapse();
+                if (endInput.val()) {
+                    if (controlObj.isRepeatEnable()) {
+                        controlObj.repeatVideo();
+                    } else {
+                        clearInterval(replayTimer);
+                    }
                 }
             }
         });
@@ -234,11 +251,16 @@ Replayer.control = {
     },
     init: function () {
         var videoControls = $('#watch-header');
-        if (videoControls.length) {
+        if (videoControls.length && $('#watch8-action-buttons').length) {
             Replayer.control.initControlBar(videoControls);
             Replayer.control.reInitValue();
             Replayer.control.listenForKey();
+        } else {
+            console.log("wait for page load completed");
+            setTimeout(Replayer.control.init(), 1000);
         }
+
+
     },
     mainControlAlreadyExist: function () {
         if ($('#repeatMainControl').length) {
