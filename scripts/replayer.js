@@ -2,7 +2,7 @@
 var Replayer = Replayer || {};
 var videoPlayer, startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox, checkBoxContainer;
 var replayTimer, initTimerId;
-var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, D_CODE = 68;
+var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, A_CODE = 65,B_CODE=66;
 var downKeysMap = {};
 var enableRepeatAtB;
 var controlObj;
@@ -123,16 +123,24 @@ Replayer.control = {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = Utils.stringToSeconds(endInput.val());
                 if (currentTime >= endTime || currentTime >= videoPlayer.duration) {
-                    controlObj.repeat();
+                    controlObj.goto(controlObj.AInSeconds());
                 }
             } else {
                 controlObj.clearRepeater();
             }
         }, 500);
     },
-    repeat: function () {
-        videoPlayer.currentTime = Utils.stringToSeconds(startInput.val());
-        videoPlayer.play();
+    AInSeconds: function () {
+        return Utils.stringToSeconds(startInput.val());
+    },
+    BInSeconds: function () {
+        return Utils.stringToSeconds(endInput.val());
+    },
+    goto:function(expectedTime){
+        if (expectedTime <= videoPlayer.duration) {
+            videoPlayer.currentTime = expectedTime;
+            videoPlayer.play();
+        }
     },
     clearRepeater: function () {
         clearInterval(replayTimer);
@@ -161,7 +169,8 @@ Replayer.control = {
             var toPress = downKeysMap[Shift_CODE] && downKeysMap[X_CODE];
             var repeatPress = downKeysMap[Shift_CODE] && downKeysMap[S_CODE];
             var resetPress = downKeysMap[Shift_CODE] && downKeysMap[C_CODE];
-            var replayNowPress = downKeysMap[Shift_CODE] && downKeysMap[D_CODE];
+            var goToAPress = downKeysMap[Shift_CODE] && downKeysMap[A_CODE];
+            var goToBPress = downKeysMap[Shift_CODE] && downKeysMap[B_CODE];
             if (fromPress) {
                 startBtn.click();
             } else if (toPress) {
@@ -171,8 +180,10 @@ Replayer.control = {
             } else if (resetPress) {
                 controlObj.clearRepeater();
                 controlObj.reInitValue();
-            } else if (replayNowPress) {
-                controlObj.repeat();
+            } else if (goToAPress) {
+                controlObj.goto(controlObj.AInSeconds());
+            }else if (goToBPress){
+                controlObj.goto(controlObj.BInSeconds());
             }
             downKeysMap[e.keyCode] = false;
         });
@@ -238,7 +249,7 @@ Replayer.control = {
 };
 var Utils = {
     stringToSeconds: function (time) {
-        var smh = time.split(":"), seconds = 1;
+        var smh = time.split(":"), seconds = 0.5;
         for (var i = 0; i < smh.length; i++) {
             seconds += smh[i] * Math.pow(60, smh.length - 1 - i);
         }
