@@ -6,12 +6,14 @@ var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, D_CODE 
 var down = {};
 var enableRepeatAtB;
 var controlObj;
-
-var A_TOOLTIP_MESSAGE =  "Press 'Shift' + 'Z' keys instead";
-var B_TOOLTIP_MESSAGE =  "Press 'Shift' + 'X' keys instead";
-var CHECKBOX_TOOLTIP_MESSAGE =  "Press 'Shift' + 'S' keys instead";
-var MESSAGE_BOX_MESSAGE="Press 'Shift' + 'C' to clear the replay";
-var REPLAY_LABEL ='Replay';
+var REPLAY_LABEL = 'Replay';
+var MESSAGE = {
+        A_TOOLTIP: "Press 'Shift' + 'Z' keys instead",
+        B_TOOLTIP: "Press 'Shift' + 'X' keys instead",
+        CHECKBOX_TOOLTIP: "Press 'Shift' + 'S' keys instead",
+        CLEAR_AB:"Press 'Shift' + 'C' to clear the replay",
+        TIME_RANGE_INVALID: "A and B are invalid!"
+    };
 Replayer.control = {
     initControlBar: function (controlElement) {
         var repeatMainControl = $("<div>").attr("id", "repeatMainControl");
@@ -23,19 +25,19 @@ Replayer.control = {
         controlObj.enableTooltip();
         controlObj.listenForMainControl();
     }, enableTooltip: function () {
-        Utils.addBottomToolTip(startBtn, A_TOOLTIP_MESSAGE);
-        Utils.addBottomToolTip(endBtn, B_TOOLTIP_MESSAGE);
-        Utils.addBottomToolTip(checkBoxContainer, CHECKBOX_TOOLTIP_MESSAGE);
+        Utils.addBottomToolTip(startBtn, MESSAGE.A_TOOLTIP);
+        Utils.addBottomToolTip(endBtn, MESSAGE.B_TOOLTIP);
+        Utils.addBottomToolTip(checkBoxContainer, MESSAGE.CHECKBOX_TOOLTIP);
         $(function () {
             $('[data-toggle="tooltip"]').tooltip();
         });
     },
     initStartInputContainer: function () {
-        var startMainControl = $('<div>').addClass("one-line").attr('id', 'startContainer');
-        var childMainControl = $('<div>').addClass("input-group");
-        startInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
-        var spanGroup = $("<span>").addClass("input-group-btn");
-        startBtn = $("<button>").attr('id', 'startBtn').addClass("btn btn-default").text("A");
+        var startMainControl = $('<div id="startContainer" class="one-line">');
+        var childMainControl = $('<div class="input-group">');
+        startInput = $("<input id='startInput' class='form-control input-text'>");
+        var spanGroup = $("<span class='input-group-btn'>");
+        startBtn = $("<button id='startBtn' class='btn btn-primary'>").text("A");
         spanGroup.append(startBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(startInput);
@@ -43,11 +45,11 @@ Replayer.control = {
         return startMainControl;
     },
     initEndInputContainer: function () {
-        var endMainControl = $('<div>').addClass("one-line").attr('id', 'endContainer');
-        var childMainControl = $('<div>').addClass("input-group");
-        endInput = $("<input>").attr('id', 'startInput').addClass("form-control input-text");
-        var spanGroup = $("<span>").addClass("input-group-btn");
-        endBtn = $("<button>").addClass("btn btn-default").text("B");
+        var endMainControl = $('<div id="endContainer" class="one-line">');
+        var childMainControl = $('<div class="input-group">');
+        endInput = $("<input id='endInput' class='form-control input-text'>");
+        var spanGroup = $("<span class='input-group-btn'>");
+        endBtn = $("<button class='btn btn-primary'>").text("B");
         spanGroup.append(endBtn);
         childMainControl.append(spanGroup);
         childMainControl.append(endInput);
@@ -55,20 +57,35 @@ Replayer.control = {
         return endMainControl;
     },
     initRepeatCheckBox: function () {
-        checkBoxContainer = $('<div>').attr('id', 'checkboxContainer').addClass("checkbox-on-off");
+        checkBoxContainer = $('<div id="checkboxContainer" class="checkbox-on-off">');
         var span = $(' <span id ="checkboxSpan" class=" yt-uix-checkbox-on-off ">');
         repeatCheckbox = $('<input id="myCheckBox" class="" type="checkbox">');
         span.append(repeatCheckbox);
-        checkBoxContainer.append($('<label for="myCheckBox"/>').text(REPLAY_LABEL));
+        checkBoxContainer.append($('<label for="myCheckBox" />').text(REPLAY_LABEL));
         span.append('<label for="myCheckBox" id="autoplay-checkbox-label" class=""><span class="checked"></span><span class="toggle"></span><span class="unchecked"></span></label>');
         checkBoxContainer.append(span);
         return checkBoxContainer;
     },
     initMessageBox: function () {
-        messageBox = $('<div>').attr("id", "messageBox").addClass("collapse");
-        messageBox.text(MESSAGE_BOX_MESSAGE);
+        messageBox = $('<div id="messageBox" class="collapse">');
+        messageBox.text(MESSAGE.CLEAR_AB);
         return messageBox;
     },
+    showErrorMessage: function (message) {
+        messageBox.addClass('errorMessageText');
+        controlObj.showMessage(message);
+    },
+    showMessage: function (message) {
+        messageBox.text(message);
+    }
+    ,
+    clearErrorMessage: function () {
+        if (messageBox.attr('class').indexOf('error') >= 0) {
+            messageBox.removeClass();
+            messageBox.text('');
+        }
+    }
+    ,
     isRepeatEnable: function () {
         return repeatCheckbox.is(':checked');
     },
@@ -81,7 +98,25 @@ Replayer.control = {
     enableRepeatCheckbox: function (value) {
         repeatCheckbox.prop('checked', value);
     },
+    timeRangeIsValid: function () {
+        return startInput.val() < endInput.val();
+    },
+    showGuildMessage: function (valid) {
+        if (!valid) {
+            controlObj.enableRepeatCheckbox(false);
+            Replayer.control.showErrorMessage(MESSAGE.TIME_RANGE_INVALID);
+            return;
+        }
+        Replayer.control.clearErrorMessage();
+        Replayer.control.showMessage(MESSAGE.CLEAR_AB);
+    }
+    ,
     repeatVideo: function () {
+        if (!Replayer.control.timeRangeIsValid()) {
+            Replayer.control.showGuildMessage(false);
+            return;
+        }
+        Replayer.control.showGuildMessage(true);
         replayTimer = setInterval(function () {
             console.log("loop");
             if (controlObj.isRepeatEnable()) {
@@ -104,16 +139,18 @@ Replayer.control = {
     },
     reInitValue: function () {
         this.setValueForStartInput(0);
+        this.initEndValue();
+        this.enableRepeatCheckbox(false);
+    },
+    initEndValue: function () {
         if (isNaN(videoPlayer.duration)) {
-            console.log("isNaN");
             setTimeout(function () {
-                console.log("after 3 seconds");
-                controlObj.setValueForEndInput(videoPlayer.duration);
-            }, 3000);
+                console.log("retry after 3 seconds");
+                Replayer.control.initEndValue();
+            }, 2000);
         } else {
             this.setValueForEndInput(videoPlayer.duration);
         }
-        this.enableRepeatCheckbox(false);
     }
     ,
     listenForKey: function () {
@@ -193,7 +230,7 @@ Replayer.control = {
         }
     },
     mainControlAlreadyExist: function () {
-        if($('#repeatMainControl').length){
+        if ($('#repeatMainControl').length) {
             return true;
         }
         return false;
@@ -228,7 +265,11 @@ var Utils = {
         return string;
     },
     addBottomToolTip: function (element, message) {
-        element.attr('data-toggle', 'tooltip').attr('data-placement', 'bottom').attr('title', message);
+        element.attr({
+            'data-toggle': 'tooltip',
+            'data-placement': 'bottom',
+            'title': message
+        });
     }
 };
 
