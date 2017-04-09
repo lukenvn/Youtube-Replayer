@@ -12,6 +12,9 @@
     "24": "images/autoreplay-24.png",
     "18": "images/autoreplay-18.png"
   },
+  "permissions": [
+    "declarativeContent"
+  ],
   "content_scripts": [
     {
       "matches": [
@@ -29,7 +32,7 @@
       ]
     }
   ],
-  "browser_action": {
+  "page_action": {
     "default_icon":  "images/autoreplay-32.png",
     "default_popup": "html/popup.html",
     "default_title": "Click here!"
