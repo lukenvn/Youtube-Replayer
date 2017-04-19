@@ -17,6 +17,7 @@
   ],
   "content_scripts": [
     {
+      "run_at": "document_end",
       "matches": [
         "http://www.youtube.com/*",
         "https://www.youtube.com/*"

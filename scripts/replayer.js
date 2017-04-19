@@ -14,6 +14,7 @@ var MESSAGE = {
     CLEAR_AB: "Press 'Shift' + 'C' to clear the replay",
     TIME_RANGE_INVALID: "A and B are invalid!"
 };
+var numberOfRetry = 0;
 Replayer.control = {
     initControlBar: function (controlElement) {
         var repeatMainControl = $("<div>").attr("id", "repeatMainControl");
@@ -159,12 +160,9 @@ Replayer.control = {
     },
     initEndValue: function () {
         if (isNaN(videoPlayer.duration)) {
-            setTimeout(function () {
-                console.log("retry after 3 seconds");
-                Replayer.control.initEndValue();
-            }, 2000);
+            setTimeout(Replayer.control.initEndValue, 2000);
         } else {
-            this.setValueForEndInput(videoPlayer.duration);
+            controlObj.setValueForEndInput(videoPlayer.duration);
         }
     }
     ,
@@ -234,30 +232,36 @@ Replayer.control = {
         });
     },
     addReplayBar: function () {
+
         videoPlayer = document.getElementsByClassName("html5-main-video")[0];
         if (videoPlayer) {
             videoPlayer.addEventListener('loadedmetadata', function (e) {
+
                 console.log("load video");
                 if (!controlObj.mainControlAlreadyExist()) {
+                    numberOfRetry = 0;
                     Replayer.control.init();
                 }
             });
-            Replayer.control.init();
+            controlObj.init();
             clearInterval(initTimerId);
         }
         else if (!initTimerId) {
+
             initTimerId = setInterval(controlObj.addReplayBar, 1000);
         }
     },
     init: function () {
         var videoControls = $('#watch-header');
         if (videoControls.length && $('#watch8-action-buttons').length) {
-            Replayer.control.initControlBar(videoControls);
-            Replayer.control.reInitValue();
-            Replayer.control.listenForKey();
+            controlObj.initControlBar(videoControls);
+            controlObj.reInitValue();
+            controlObj.listenForKey();
         } else {
-            console.log("wait for page load completed");
-            setTimeout(Replayer.control.init(), 1000);
+            if (numberOfRetry++ <= 3) {
+                console.log("wait for page load completed " + numberOfRetry);
+                setTimeout(controlObj.init, 10000);
+            }
         }
 
 
@@ -307,6 +311,5 @@ var Utils = {
 };
 setTimeout(function () {
     controlObj = Replayer.control;
-    Replayer.control.addReplayBar();
+    controlObj.addReplayBar();
 }, 1000);
-
