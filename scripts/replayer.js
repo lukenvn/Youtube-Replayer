@@ -1,7 +1,7 @@
 "use strict";
 var Replayer = Replayer || {};
 var videoPlayer, startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox, checkBoxContainer;
-var replayTimer, initTimerId;
+var replayTimer, initTimerId,retryTimeout;
 var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, A_CODE = 65, B_CODE = 66;
 var downKeysMap = {};
 var enableRepeatAtB;
@@ -122,8 +122,7 @@ Replayer.control = {
             Replayer.control.clearErrorMessage();
             Replayer.control.showMessage(MESSAGE.CLEAR_AB);
         }
-    }
-    ,
+    },
     repeatVideo: function () {
         replayTimer = setInterval(function () {
             console.log("loop");
@@ -231,15 +230,17 @@ Replayer.control = {
             }
         });
     },
+    resetRetryInitReplayBar: function () {
+        numberOfRetry = 0;
+        clearTimeout(retryTimeout);
+    },
     addReplayBar: function () {
-
         videoPlayer = document.getElementsByClassName("html5-main-video")[0];
         if (videoPlayer) {
             videoPlayer.addEventListener('loadedmetadata', function (e) {
-
                 console.log("load video");
                 if (!controlObj.mainControlAlreadyExist()) {
-                    numberOfRetry = 0;
+                    controlObj.resetRetryInitReplayBar();
                     Replayer.control.init();
                 }
             });
@@ -260,11 +261,9 @@ Replayer.control = {
         } else {
             if (numberOfRetry++ <= 3) {
                 console.log("wait for page load completed " + numberOfRetry);
-                setTimeout(controlObj.init, 10000);
+               retryTimeout = setTimeout(controlObj.init, 1000);
             }
         }
-
-
     },
     mainControlAlreadyExist: function () {
         if ($('#repeatMainControl').length) {
