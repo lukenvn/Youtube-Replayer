@@ -130,7 +130,7 @@ Replayer.control = {
                 var currentTime = videoPlayer.currentTime;
                 var endTime = Utils.stringToSeconds(endInput.val());
                 if (currentTime >= endTime || currentTime >= videoPlayer.duration) {
-                    controlObj.goto(controlObj.AInSeconds());
+                    controlObj.seekTo(controlObj.AInSeconds());
                 }
             } else {
                 controlObj.clearRepeater();
@@ -143,7 +143,7 @@ Replayer.control = {
     BInSeconds: function () {
         return Utils.stringToSeconds(endInput.val());
     },
-    goto: function (expectedTime) {
+    seekTo: function (expectedTime) {
         if (expectedTime <= videoPlayer.duration) {
             videoPlayer.currentTime = expectedTime;
             videoPlayer.play();
@@ -185,9 +185,9 @@ Replayer.control = {
                 controlObj.clearRepeater();
                 controlObj.reInitValue();
             } else if (goToAPress) {
-                controlObj.goto(controlObj.AInSeconds());
+                controlObj.seekTo(controlObj.AInSeconds());
             } else if (goToBPress) {
-                controlObj.goto(controlObj.BInSeconds());
+                controlObj.seekTo(controlObj.BInSeconds());
             }
             downKeysMap[e.keyCode] = false;
         });

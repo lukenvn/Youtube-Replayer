@@ -23,13 +23,13 @@
         "https://www.youtube.com/*"
       ],
       "css": [
-        "css/replayer.css",
+        "css/content.css",
         "css/bootstrap.css"
       ],
       "js": [
         "scripts/jquery.js",
         "scripts/bootstrap.js",
-        "scripts/replayer.js"
+        "scripts/content.js"
       ]
     }
   ],
