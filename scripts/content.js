@@ -1,7 +1,7 @@
 "use strict";
 var Replayer = Replayer || {};
 var videoPlayer, startInput, endInput, startBtn, endBtn, repeatCheckbox, messageBox, checkBoxContainer;
-var replayTimer, initTimerId,retryTimeout;
+var replayTimer, initTimerId, retryTimeout;
 var Z_CODE = 90, X_CODE = 88, C_CODE = 67, S_CODE = 83, Shift_CODE = 16, A_CODE = 65, B_CODE = 66;
 var downKeysMap = {};
 var enableRepeatAtB;
@@ -25,6 +25,9 @@ Replayer.control = {
         controlElement.append(repeatMainControl);
         controlObj.enableTooltip();
         controlObj.listenForMainControl();
+        if (Utils.isNewVersion()) {
+            repeatMainControl.addClass("new-version");
+        }
     }, enableTooltip: function () {
         Utils.addBottomToolTip(startBtn, MESSAGE.A_TOOLTIP);
         Utils.addBottomToolTip(endBtn, MESSAGE.B_TOOLTIP);
@@ -253,15 +256,37 @@ Replayer.control = {
         }
     },
     init: function () {
-        var videoControls = $('#watch-header');
-        if (videoControls.length && $('#watch8-action-buttons').length) {
+        if (Utils.isNewVersion()) {
+            controlObj.initForNewVersion();
+        } else {
+            controlObj.initForOldVersion();
+        }
+
+    },
+    initForOldVersion: function () {
+        var videoControls = $('#watch7-speedyg-area');
+        if (videoControls.length) {
+            controlObj.initControlBar(videoControls);
+            controlObj.reInitValue();
+            controlObj.listenForKey();
+            videoControls.addClass("yt-card");
+        } else {
+            if (numberOfRetry++ <= 3) {
+                console.log("wait for page load completed " + numberOfRetry);
+                retryTimeout = setTimeout(controlObj.initForOldVersion, 1000);
+            }
+        }
+    },
+    initForNewVersion: function () {
+        var videoControls = $('#pla-shelf');
+        if (videoControls.length) {
             controlObj.initControlBar(videoControls);
             controlObj.reInitValue();
             controlObj.listenForKey();
         } else {
             if (numberOfRetry++ <= 3) {
                 console.log("wait for page load completed " + numberOfRetry);
-               retryTimeout = setTimeout(controlObj.init, 1000);
+                retryTimeout = setTimeout(controlObj.initForOldVersion, 1000);
             }
         }
     },
@@ -273,6 +298,9 @@ Replayer.control = {
     }
 };
 var Utils = {
+    isNewVersion: function () {
+        return $('ytd-watch') != null && $('ytd-watch').length>0 ;
+    },
     stringToSeconds: function (time) {
         var smh = time.split(":"), seconds = 0.5;
         for (var i = 0; i < smh.length; i++) {
