@@ -1,0 +1,29 @@
+body {
+    min-width: 285px;
+    margin: 0px;
+    font-family: Segoe UI, Arial, sans-serif;
+    font-size: 13px;
+    color: #545454;
+    background-color: #f8f6f2;
+    background-image: url(/images/background.png);
+}
+#titletext {
+    padding: 8px 8px 2px 0px;
+    text-align: center;
+}
+.logo {
+    cursor: pointer;
+    height: auto;
+    width: 20%;
+}
+.menu{
+
+    padding: 10px 0px 10px 15px;
+}
+.item{
+    border-top: 1px dashed #a5a4a1;
+}
+#footer{
+    float: right;
+}
+
