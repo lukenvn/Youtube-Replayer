@@ -8,9 +8,9 @@ var enableRepeatAtB;
 var controlObj;
 var REPLAY_LABEL = 'Replay';
 var MESSAGE = {
-    A_TOOLTIP: "Press 'Shift' + 'Z' keys instead",
-    B_TOOLTIP: "Press 'Shift' + 'X' keys instead",
-    CHECKBOX_TOOLTIP: "Press 'Shift' + 'S' keys instead",
+    A_TOOLTIP: "Click to set starting point A",
+    B_TOOLTIP: "Click to set ending point B ",
+    CHECKBOX_TOOLTIP: "Click to replay the section",
     CLEAR_AB: "Press 'Shift' + 'C' to clear the replay",
     TIME_RANGE_INVALID: "A and B are invalid!"
 };
@@ -176,22 +176,14 @@ Replayer.control = {
             var toPress = downKeysMap[Shift_CODE] && downKeysMap[X_CODE];
             var repeatPress = downKeysMap[Shift_CODE] && downKeysMap[S_CODE];
             var resetPress = downKeysMap[Shift_CODE] && downKeysMap[C_CODE];
-            var goToAPress = downKeysMap[Shift_CODE] && downKeysMap[A_CODE];
-            var goToBPress = downKeysMap[Shift_CODE] && downKeysMap[B_CODE];
-            if (fromPress) {
-                startBtn.click();
-            } else if (toPress) {
-                endBtn.click();
-            } else if (repeatPress) {
-                repeatCheckbox.click();
-            } else if (resetPress) {
-                controlObj.clearRepeater();
-                controlObj.reInitValue();
-            } else if (goToAPress) {
-                controlObj.seekTo(controlObj.AInSeconds());
-            } else if (goToBPress) {
-                controlObj.seekTo(controlObj.BInSeconds());
-            }
+            var seekToAPress = downKeysMap[Shift_CODE] && downKeysMap[A_CODE];
+            var seekToBPress = downKeysMap[Shift_CODE] && downKeysMap[B_CODE];
+            fromPress && startBtn.click();
+            toPress && endBtn.click();
+            repeatPress && repeatCheckbox.click();
+            resetPress && controlObj.clearRepeater() & controlObj.reInitValue();
+            seekToAPress && controlObj.seekTo(controlObj.AInSeconds());
+            seekToBPress && controlObj.seekTo(controlObj.BInSeconds());
             downKeysMap[e.keyCode] = false;
         });
     },
@@ -245,6 +237,9 @@ Replayer.control = {
                 if (!controlObj.mainControlAlreadyExist()) {
                     controlObj.resetRetryInitReplayBar();
                     Replayer.control.init();
+                } else {
+                    controlObj.clearRepeater();
+                    controlObj.reInitValue();
                 }
             });
             controlObj.init();
@@ -273,7 +268,7 @@ Replayer.control = {
         } else {
             if (numberOfRetry++ <= 3) {
                 console.log("wait for page load completed " + numberOfRetry);
-                retryTimeout = setTimeout(controlObj.initForOldVersion, 1000);
+                retryTimeout = setTimeout(controlObj.init, 1000);
             }
         }
     },
@@ -286,7 +281,7 @@ Replayer.control = {
         } else {
             if (numberOfRetry++ <= 3) {
                 console.log("wait for page load completed " + numberOfRetry);
-                retryTimeout = setTimeout(controlObj.initForOldVersion, 1000);
+                retryTimeout = setTimeout(controlObj.init, 1000);
             }
         }
     },
@@ -299,7 +294,7 @@ Replayer.control = {
 };
 var Utils = {
     isNewVersion: function () {
-        return $('ytd-watch') != null && $('ytd-watch').length>0 ;
+        return $('ytd-watch') != null && $('ytd-watch').length > 0;
     },
     stringToSeconds: function (time) {
         var smh = time.split(":"), seconds = 0.5;
@@ -340,3 +335,11 @@ setTimeout(function () {
     controlObj = Replayer.control;
     controlObj.addReplayBar();
 }, 1000);
+
+// // AUTOSKIP
+// setInterval(function () {
+//     var skipContainer = $('.videoAdUiPreSkipContainer');
+//     skipContainer && skipContainer.remove()
+//     var skipButton = $(".videoAdUiSkipButton");
+//     skipButton && skipButton.click()
+// }, 1000)
